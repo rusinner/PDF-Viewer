@@ -8,6 +8,8 @@
           integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" 
           crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js" integrity="sha512-tqaIiFJopq4lTBmFlWF0MNzzTpDsHyug8tJaaY0VkcH5AR2ANMJlcD+3fIL+RQ4JU3K6edt9OoySKfCCyKgkng==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>   
+
     <title>PDF_Viewer</title>
 </head>
 <body>
@@ -26,7 +28,7 @@
         </button>
     </div>
         <span class="page-info">
-            Page <span id="page-num"></span> of <span id="page-count"></span>
+            Page <span id="current_page"></span>
         </span>
         <div class="zoom-Container">
         <span id="zoomValue">150%</span>
@@ -46,13 +48,15 @@
         </button>
         <input type="file" id="inputFile" hidden>
  </div>
+ <div class="canvas_container">
+ 
+     <h3>Open a PDF File</h3>
+     <canvas class="pdf-viewer hidden"></canvas>
+     
+</div>
 
-    <canvas id="pdf-render"></canvas>
 
 
-
-
-    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
     <script src="./main.js"></script>
 </body>
 </html>

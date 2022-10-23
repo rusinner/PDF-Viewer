@@ -41,4 +41,11 @@
   background: orangered;
   color: #fff;
   padding: 1rem;
+}
+
+.canvas_container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }/*# sourceMappingURL=styles.css.map */

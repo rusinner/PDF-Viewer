@@ -1,101 +1,89 @@
-//declaring variables
-const url = '../docs/Asimov_the_foundation.pdf';
-const zoomButton = document.getElementById('zoom')
+const zoomButton = document.getElementById('zoom');
 const input = document.getElementById('inputFile');
 const openFile = document.getElementById('openPDF');
+const currentPage = document.getElementById('current_page');
+const viewer = document.querySelector('.pdf-viewer');
+let currentPDF = {}
 
-let pdfDoc = null,
-pageNum = 1,
-pageIsRendering = false,
-pageNumIsPending = null;
-
-const scale = 1.8,
-      canvas = document.querySelector('#pdf-render'),
-      ctx = canvas.getContext('2d');
-
-//  Render the page
-
-const renderPage = num => {
-pageIsRendering = true;
-
-//get the page
-pdfDoc.getPage(num).then(page => {
-const viewport = page.getViewport({scale});
-canvas.height = viewport.height;
-canvas.width = viewport.width;
-
-const renderCtx = {
-    canvasContext:ctx,
-    viewport
+function resetCurrentPDF() {
+	currentPDF = {
+		file: null,
+		countOfPages: 0,
+		currentPage: 1,
+		zoom: 1.5
+	}
 }
 
-page.render(renderCtx).promise.then(() => {
-    pageIsRendering = false;
 
-    if(pageNumIsPending !== null){
-        renderPage(pageNumIsPending);
-        pageNumIsPending = null;
-    }
+openFile.addEventListener('click', () => {
+	input.click();
 });
 
-//Output current Page
-document.querySelector('#page-num').textContent = num;
-});
-}
-
-//Check for PAges rendering
-
-const queueRenderPage = num => {
-    if(pageIsRendering){
-        pageNumIsPending = num;
-
-    }else{
-        renderPage(num);
-    }
-}
-
-//Show Prev Page
-const showPrevPage = () => {
-    if(pageNum <= 1){
-        return;
-    }
-    pageNum--;
-    queueRenderPage(pageNum);
-}
-
-//Show Next Page
-const showNextPage = () => {
-    if(pageNum >= pdfDoc.numPages){
-        return;
-    }
-    pageNum++;
-    queueRenderPage(pageNum);
-}
-
-
-
-
-//get the document
-
-pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
-pdfDoc =pdfDoc_;
-document.querySelector('#page-count').textContent = pdfDoc.numPages;
-
-renderPage(pageNum);
-
-})
-.catch(err => {
-    //Display Error
-    const div = document.createElement('div');
-    div.className = 'error';
-    div.appendChild(document.createTextNode(err.message));
-    document.querySelector('body').insertBefore(div,canvas);
-    //remove top bar
-    document.querySelector('.top-bar').getElementsByClassName.display = 'none';
-
+input.addEventListener('change', event => {
+	const inputFile = event.target.files[0];
+	if (inputFile.type == 'application/pdf') {
+		const reader = new FileReader();
+		reader.readAsDataURL(inputFile);
+		reader.onload = () => {
+			loadPDF(reader.result);
+			zoomButton.disabled = false;
+		}
+	}
+	else {
+		alert("The file you are trying to open is not a pdf file!")
+	}
 });
 
-//Button Events
 
-document.querySelector('#prev-page').addEventListener('click',showPrevPage);
-document.querySelector('#next-page').addEventListener('click',showNextPage);
+zoomButton.addEventListener('input', () => {
+	if (currentPDF.file) {
+		document.getElementById('zoomValue').innerHTML = zoomButton.value + "%";
+		currentPDF.zoom = parseInt(zoomButton.value) / 100;
+		renderCurrentPage();
+	}
+});
+
+document.getElementById('next-page').addEventListener('click', () => {
+	const isValidPage = currentPDF.currentPage < currentPDF.countOfPages;
+	if (isValidPage) {
+		currentPDF.currentPage += 1;
+		renderCurrentPage();
+	}
+});
+
+document.getElementById('prev-page').addEventListener('click', () => {
+	const isValidPage = currentPDF.currentPage - 1 > 0;
+	if (isValidPage) {
+		currentPDF.currentPage -= 1;
+		renderCurrentPage();
+	}
+});
+
+function loadPDF(data) {
+	const pdfFile = pdfjsLib.getDocument(data);
+	resetCurrentPDF();
+	pdfFile.promise.then((doc) => {
+		currentPDF.file = doc;
+		currentPDF.countOfPages = doc.numPages;
+		viewer.classList.remove('hidden');
+		document.querySelector('h3').style.display = 'none';
+		renderCurrentPage();
+	});
+
+}
+
+function renderCurrentPage() {
+	currentPDF.file.getPage(currentPDF.currentPage).then((page) => {
+		var context = viewer.getContext('2d');
+		var viewport = page.getViewport({ scale: currentPDF.zoom, });
+		viewer.height = viewport.height;
+		viewer.width = viewport.width;
+
+		var renderContext = {
+			canvasContext: context,
+			viewport: viewport
+		};
+		page.render(renderContext);
+	});
+	currentPage.innerHTML = currentPDF.currentPage + ' of ' + currentPDF.countOfPages;
+}
