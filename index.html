@@ -4,13 +4,55 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" 
+          integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="styles.css">
     <title>PDF_Viewer</title>
 </head>
 <body>
-    
+ <div class="top-bar">
+        <div class="buttons">
+        <button class="btn" id="prev-page">
+            <i class="fas fa-arrow-circle-left">
+                Prev Page
+            </i>
+        </button>
+
+        <button class="btn" id="next-page">
+            <i class="fas fa-arrow-circle-right">
+                Next Page
+            </i>
+        </button>
+    </div>
+        <span class="page-info">
+            Page <span id="page-num"></span> of <span id="page-count"></span>
+        </span>
+        <div class="zoom-Container">
+        <span id="zoomValue">150%</span>
+        <input type="range"
+                id="zoom"
+                name="cowbell"
+                min="100"
+                max="300"
+                value="150"
+                step="50"
+                disabled
+        />
+    </div>
+        <button id="openPDF">
+            <span>Open</span>
+            <i class="fas fa-folder-open"></i>
+        </button>
+        <input type="file" id="inputFile" hidden>
+ </div>
+
+    <canvas id="pdf-render"></canvas>
 
 
+
+
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
     <script src="./main.js"></script>
 </body>
 </html>
